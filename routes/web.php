@@ -31,3 +31,6 @@ Route::get('/sapa/{nama?}', function ($nama = 'Semua') {
 
 // http://localhost:8000/sapa/Ani
 // Output: "Halo, Ani! Selamat datang di Toko Online."
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
