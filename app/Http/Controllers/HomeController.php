@@ -45,7 +45,7 @@ class HomeController extends Controller
         // - Aktif dan ada stok
         // ================================================
         $featuredProducts = Product::query()
-            ->with(['category', 'primaryImage'])  // Eager load untuk performa
+            ->with(['category'])  // Eager load untuk performa
             ->active()                             // Scope: is_active = true
             ->inStock()                            // Scope: stock > 0
             ->featured()                           // Scope: is_featured = true
@@ -58,7 +58,7 @@ class HomeController extends Controller
         // - Urutkan dari yang paling baru
         // ================================================
         $latestProducts = Product::query()
-            ->with(['category', 'primaryImage'])
+            ->with(['category'])
             ->active()
             ->inStock()
             ->latest()         // Order by created_at DESC

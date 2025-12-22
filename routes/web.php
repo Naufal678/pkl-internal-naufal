@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CartController;
@@ -7,17 +9,17 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use Illuminate\Support\Facades\Route;
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| HALAMAN UMUM
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/tentang', function () {
     return view('tentang');
@@ -27,77 +29,48 @@ Route::get('/sapa/{nama?}', function ($nama = 'Semua') {
     return "Halo, $nama! Selamat datang di Toko Online.";
 });
 
-Route::controller(GoogleController::class)->group(function () {
-    // ================================================
-    // ROUTE 1: REDIRECT KE GOOGLE
-    // ================================================
-    // URL: /auth/google
-    // Dipanggil saat user klik tombol "Login dengan Google"
-    // ================================================
-    Route::get('/auth/google', 'redirect')
-             ->name('auth.google');
-
-    // ================================================
-    // ROUTE 2: CALLBACK DARI GOOGLE
-    // ================================================
-    // URL: /auth/google/callback
-    // Dipanggil oleh Google setelah user klik "Allow"
-    // URL ini HARUS sama dengan yang didaftarkan di Google Console!
-    // ================================================
-    Route::get('/auth/google/callback', 'callback')
-        ->name('auth.google.callback');
-});
 /*
 |--------------------------------------------------------------------------
-| AUTH ROUTES (LOGIN, REGISTER, LOGOUT)
+| AUTH GOOGLE
+|--------------------------------------------------------------------------
+*/
+Route::controller(GoogleController::class)->group(function () {
+    Route::get('/auth/google', 'redirect')->name('auth.google');
+    Route::get('/auth/google/callback', 'callback')->name('auth.google.callback');
+});
+
+/*
+|--------------------------------------------------------------------------
+| AUTH BAWAAN LARAVEL
 |--------------------------------------------------------------------------
 */
 Auth::routes();
 
 /*
 |--------------------------------------------------------------------------
-| ROUTE YANG WAJIB LOGIN
+| HOMEPAGE & KATALOG (PUBLIK)
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/products', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/products/{slug}', [CatalogController::class, 'show'])->name('catalog.show');
+
+/*
+|--------------------------------------------------------------------------
+| ROUTE LOGIN (USER)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/home', [HomeController::class, 'index'])
-        ->name('home');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
-
-    Route::put('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
-});
-
-// routes/web.php
-
-Route::middleware('auth')->group(function () {
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.destroy');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-});
 
-// ================================================
-// HALAMAN PUBLIK (Tanpa Login)
-// ================================================
-
-// Homepage
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// Katalog Produk
-Route::get('/products', [CatalogController::class, 'index'])->name('catalog.index');
-Route::get('/products/{slug}', [CatalogController::class, 'show'])->name('catalog.show');
-
-
-// ================================================
-// HALAMAN YANG BUTUH LOGIN (Customer)
-// ================================================
-
-Route::middleware('auth')->group(function () {
-    // Keranjang Belanja
+    // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::patch('/cart/{item}', [CartController::class, 'update'])->name('cart.update');
@@ -111,33 +84,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
-    // Pesanan Saya
+    // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-
-    // Profil
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+/*
+|--------------------------------------------------------------------------
+| ADMIN (TANPA DASHBOARD CONTROLLER)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-// ================================================
-// HALAMAN ADMIN (Butuh Login + Role Admin)
-// ================================================
+        // ✅ DASHBOARD TANPA CONTROLLER
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        // Produk
+        Route::resource('products', AdminProductController::class);
 
-    // Produk CRUD
-    Route::resource('products', AdminProductController::class);
+        // Kategori
+        Route::resource('categories', AdminCategoryController::class);
 
-    // Kategori CRUD
-    Route::resource('categories', AdminCategoryController::class);
-
-    // Manajemen Pesanan
-    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
-    Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
-});
+        // Orders
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+        Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    });
