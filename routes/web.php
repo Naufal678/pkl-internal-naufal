@@ -72,6 +72,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.destroy');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::patch('/profile/avatar', [ProfileController::class, 'updateAvatar'])
+    ->name('profile.avatar.update');
 
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -212,4 +214,20 @@ Route::post('midtrans/notification', [MidtransNotificationController::class, 'ha
     ->name('midtrans.notification');
 
     // Batasi 5 request per menit
-Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+// Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+Route::middleware('auth')->group(function () {
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('status', 'verification-link-sent');
+    })->name('verification.send');
+
+});
+
+Route::middleware('auth')->group(function () {
+    Route::delete('/profile/google/unlink', [ProfileController::class, 'unlinkGoogle'])
+        ->name('profile.google.unlink');
+});
