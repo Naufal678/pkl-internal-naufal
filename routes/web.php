@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -113,6 +114,7 @@ Route::middleware(['auth', 'admin'])
         // Kategori
         Route::resource('categories', AdminCategoryController::class);
 
+
         // Orders
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
@@ -126,6 +128,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Produk
     Route::resource('products', ProductController::class);
+
+    // Laporan Penjualan
+    Route::get('/reports/sales',
+            [ReportController::class, 'sales']
+        )->name('reports.sales');
+     Route::get('/reports/sales/export',
+            [ReportController::class, 'exportSales']
+        )->name('reports.export-sales');
 
     // Route tambahan untuk AJAX Image Handling (jika diperlukan)
     // ...

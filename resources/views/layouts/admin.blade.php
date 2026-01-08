@@ -82,24 +82,24 @@
                                  Best Practice: Gunakan View Composer atau inject variable dari Controller.
                                  Jangan query database langsung di Blade view di production app! --}}
                             {{-- @php --}}
-                                $pendingCount = \App\Models\Order::where('status', 'pending')
+                                {{-- $pendingCount = \App\Models\Order::where('status', 'pending')
                                     ->where('payment_status', 'paid')->count();
                             @endphp
                             @if($pendingCount > 0)
                                 <span class="badge bg-warning text-dark ms-auto">{{ $pendingCount }}</span>
-                            @endif
+                            @endif --}}
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.users.index') }}"
+                        {{-- <a href="{{ route('admin.users.index') }}"
                            class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                             <i class="bi bi-people me-2"></i> Pengguna
-                        </a>
+                        </a> --}}
                     </li>
 
                     <li class="nav-item mt-3">
-                        <span class="nav-link text-muted small text-uppercase">Laporan</span>
+                        <span class="nav-link small text-uppercase">Laporan</span>
                     </li>
 
                     <li class="nav-item">
