@@ -2,44 +2,33 @@
 
 @section('content')
 
-<div class="container py-5">
+<div class="container py-5" style="background-color:#ffffff; border-radius:16px;">
     <div class="row justify-content-center">
         <div class="col-lg-8">
 
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0">
 
                 {{-- Header Order --}}
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header text-white"
+                     style="background:linear-gradient(90deg,#dc3545,#ff9800);">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h1 class="h3 mb-1 fw-bold text-dark">
+                            <h1 class="h4 mb-1 fw-bold">
                                 Order #{{ $order->order_number }}
                             </h1>
-                            <p class="text-muted mb-0">
+                            <small>
                                 {{ $order->created_at->format('d M Y, H:i') }}
-                            </p>
+                            </small>
                         </div>
 
-                        {{-- Status Badge --}}
                         <span class="badge rounded-pill fs-6 px-4 py-2
                             @switch($order->status)
-                                @case('pending')
-                                    bg-warning text-dark
-                                    @break
-                                @case('processing')
-                                    bg-primary text-white
-                                    @break
-                                @case('shipped')
-                                    bg-info text-white
-                                    @break
-                                @case('delivered')
-                                    bg-success text-white
-                                    @break
-                                @case('cancelled')
-                                    bg-danger text-white
-                                    @break
-                                @default
-                                    bg-secondary text-white
+                                @case('pending') bg-warning text-dark @break
+                                @case('processing') bg-primary @break
+                                @case('shipped') bg-info @break
+                                @case('delivered') bg-success @break
+                                @case('cancelled') bg-danger @break
+                                @default bg-secondary
                             @endswitch
                         ">
                             {{ ucfirst($order->status) }}
@@ -47,18 +36,20 @@
                     </div>
                 </div>
 
-                {{-- Detail Items --}}
+                {{-- Produk --}}
                 <div class="card-body">
-                    <h3 class="h5 fw-semibold mb-4">Produk yang Dipesan</h3>
+                    <h3 class="h5 fw-semibold mb-4" style="color:#dc3545;">
+                        Produk yang Dipesan
+                    </h3>
 
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
-                            <thead class="table-light">
+                            <thead style="background-color:#ffe8cc;">
                                 <tr>
-                                    <th class="border-0">Produk</th>
-                                    <th class="border-0 text-center">Qty</th>
-                                    <th class="border-0 text-end">Harga</th>
-                                    <th class="border-0 text-end">Subtotal</th>
+                                    <th>Produk</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Harga</th>
+                                    <th class="text-end">Subtotal</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,29 +60,27 @@
                                     <td class="text-end">
                                         Rp {{ number_format($item->discount_price ?? $item->price, 0, ',', '.') }}
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-end fw-semibold" style="color:#ff9800;">
                                         Rp {{ number_format($item->subtotal, 0, ',', '.') }}
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot class="border-top border-3">
+                            <tfoot class="border-top">
                                 @if($order->shipping_cost > 0)
                                 <tr>
-                                    <td colspan="3" class="pt-3 text-end">Ongkos Kirim:</td>
-                                    <td class="pt-3 text-end">
+                                    <td colspan="3" class="text-end">Ongkos Kirim</td>
+                                    <td class="text-end">
                                         Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}
                                     </td>
                                 </tr>
                                 @endif
                                 <tr>
-                                    <td colspan="3" class="pt-3 text-end">
-                                        <strong class="h5 mb-0">TOTAL BAYAR:</strong>
+                                    <td colspan="3" class="text-end fw-bold fs-5">
+                                        TOTAL BAYAR
                                     </td>
-                                    <td class="pt-3 text-end">
-                                        <strong class="h4 mb-0 text-primary">
-                                            Rp {{ number_format($order->total_amount, 0, ',', '.') }}
-                                        </strong>
+                                    <td class="text-end fw-bold fs-4" style="color:#dc3545;">
+                                        Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                                     </td>
                                 </tr>
                             </tfoot>
@@ -99,9 +88,11 @@
                     </div>
                 </div>
 
-                {{-- Alamat Pengiriman --}}
-                <div class="card-body bg-light border-top">
-                    <h3 class="h5 fw-semibold mb-3">Alamat Pengiriman</h3>
+                {{-- Alamat --}}
+                <div class="card-body border-top" style="background-color:#fff0e0;">
+                    <h3 class="h6 fw-semibold mb-2" style="color:#dc3545;">
+                        Alamat Pengiriman
+                    </h3>
                     <address class="mb-0">
                         <strong>{{ $order->shipping_name }}</strong><br>
                         {{ $order->shipping_phone }}<br>
@@ -109,13 +100,15 @@
                     </address>
                 </div>
 
-                {{-- Tombol Bayar (hanya jika pending) --}}
+                {{-- Bayar --}}
                 @if($order->status === 'pending' && $order->snap_token)
-                <div class="card-body bg-primary bg-opacity-10 border-top text-center">
+                <div class="card-body border-top text-center">
                     <p class="text-muted mb-4">
-                        Selesaikan pembayaran Anda sebelum batas waktu berakhir.
+                        Selesaikan pembayaran sebelum batas waktu berakhir.
                     </p>
-                    <button id="pay-button" class="btn btn-primary btn-lg px-5 shadow-sm">
+                    <button id="pay-button"
+                            class="btn btn-lg text-white px-5 shadow"
+                            style="background-color:#dc3545;">
                         <i class="bi bi-credit-card me-2"></i> Bayar Sekarang
                     </button>
                 </div>
@@ -126,46 +119,29 @@
     </div>
 </div>
 
-{{-- Snap.js Integration --}}
+{{-- Snap.js --}}
 @if($order->snap_token)
 @push('scripts')
-{{-- Load Snap JS dari Midtrans --}}
-<script src="{{ config('midtrans.snap_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script src="{{ config('midtrans.snap_url') }}"
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
 
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        const payButton = document.getElementById('pay-button');
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('pay-button');
+    if (!btn) return;
 
-        if (payButton) {
-            payButton.addEventListener('click', function () {
-                // Disable button untuk mencegah double click
-                payButton.disabled = true;
-                payButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Memproses...';
+    btn.addEventListener('click', () => {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Memproses...';
 
-                window.snap.pay('{{ $order->snap_token }}', {
-                    onSuccess: function (result) {
-                        console.log('Payment Success:', result);
-                        window.location.href = '{{ route("orders.success", $order) }}';
-                    },
-                    onPending: function (result) {
-                        console.log('Payment Pending:', result);
-                        window.location.href = '{{ route("orders.pending", $order) }}';
-                    },
-                    onError: function (result) {
-                        console.log('Payment Error:', result);
-                        alert('Pembayaran gagal! Silakan coba lagi.');
-                        payButton.disabled = false;
-                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i> Bayar Sekarang';
-                    },
-                    onClose: function () {
-                        console.log('Payment popup closed');
-                        payButton.disabled = false;
-                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i> Bayar Sekarang';
-                    }
-                });
-            });
-        }
+        window.snap.pay('{{ $order->snap_token }}', {
+            onSuccess: () => window.location.href = '{{ route("orders.success", $order) }}',
+            onPending: () => window.location.href = '{{ route("orders.pending", $order) }}',
+            onError: () => location.reload(),
+            onClose: () => location.reload()
+        });
     });
+});
 </script>
 @endpush
 @endif

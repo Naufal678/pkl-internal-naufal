@@ -1,76 +1,103 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+        <div class="col-md-6">
 
-                <div class="card-body">
+            <div class="card border-0 shadow-lg rounded-4">
+                {{-- HEADER --}}
+                <div class="card-header text-white text-center rounded-top-4"
+                     style="background: linear-gradient(90deg, #EF4444, #F97316);">
+                    <h4 class="mb-0 fw-bold">🍩 Daftar Akun SnackFavorit</h4>
+                </div>
+
+                <div class="card-body p-4">
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
 
-                        <div class="row mb-3">
-                            <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                        {{-- NAME --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nama Lengkap</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value="{{ old('name') }}"
+                                class="form-control form-control-lg @error('name') is-invalid @enderror"
+                                placeholder="Nama lengkap"
+                                required
+                                autofocus
+                            >
+                            @error('name')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
                         </div>
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                        {{-- EMAIL --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                placeholder="nama@email.com"
+                                required
+                            >
+                            @error('email')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
                         </div>
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                        {{-- PASSWORD --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                placeholder="••••••••"
+                                required
+                            >
+                            @error('password')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
                         </div>
 
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
+                        {{-- CONFIRM PASSWORD --}}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Konfirmasi Password</label>
+                            <input
+                                type="password"
+                                name="password_confirmation"
+                                class="form-control form-control-lg"
+                                placeholder="••••••••"
+                                required
+                            >
                         </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
+                        {{-- BUTTON REGISTER --}}
+                        <div class="d-grid">
+                            <button type="submit"
+                                    class="btn btn-lg text-white"
+                                    style="background:#F97316;">
+                                📝 Daftar Sekarang
+                            </button>
                         </div>
+
+                        {{-- LINK LOGIN --}}
+                        <p class="mt-4 text-center mb-0">
+                            Sudah punya akun?
+                            <a href="{{ route('login') }}"
+                               class="fw-bold text-danger text-decoration-none">
+                                Login di sini
+                            </a>
+                        </p>
+
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
